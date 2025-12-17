@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Manajemen Data Mahasiswa</title>
+
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    padding: 20px; 
+    background: linear-gradient(135deg, #4e54c8, #8f94fb); 
+}
+.container { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 16px; 
+    max-width: 950px; 
+    margin:auto; 
+    box-shadow:0 8px 25px rgba(0,0,0,0.25); 
+}
+button { 
+    padding:10px 16px; 
+    margin:6px; 
+    border:none; 
+    border-radius:8px; 
+    cursor:pointer; 
+    font-weight:600; 
+}
+button.primary { background:#4e54c8; color:white; }
+button.danger { background:#d9534f; color:white; }
+button.secondary { background:#6c757d; color:white; }
+
+input { 
+    padding:10px; 
+    margin:6px; 
+    width:230px; 
+    border-radius:8px; 
+    border:1px solid #bbb; 
+}
+input:focus { 
+    outline:none; 
+    border-color:#4e54c8; 
+    box-shadow:0 0 4px #4e54c8; 
+}
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 20px; 
+    background:#1e1e2f; 
+    color:white; 
+    border-radius:12px; 
+    overflow:hidden; 
+}
+th,td { padding: 12px; border-bottom: 1px solid #333; }
+th { background:#2a2a3d; }
+
+#panel { 
+    background:#f3f4ff; 
+    padding:15px; 
+    margin:15px 0; 
+    border-radius:12px; 
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<!-- JUDUL SUDAH FIX -->
+<h2 style="
+    font-family:'Poppins', sans-serif;
+    font-size:36px;
+    font-weight:800;
+    background:linear-gradient(90deg,#4e54c8,#8f94fb);
+    -webkit-background-clip:text;
+    color:transparent;
+    text-shadow:0 2px 4px rgba(0,0,0,0.2);
+    letter-spacing:1.2px;
+    margin-top:0;
+    margin-bottom:10px;
+">
+    Manajemen Data Mahasiswa
+</h2>
+
+<h3 style="font-family:'Poppins'; margin-top:10px;">Tambah Data Mahasiswa</h3>
+
+<div style="background:#eef1ff; padding:15px; border-radius:12px; margin-bottom:20px;">
+  <input id="nameInput" placeholder="Nama Mahasiswa" />
+  <input id="nimInput" placeholder="NIM" />
+  <input id="emailInput" placeholder="Email" />
+  <input id="majorInput" placeholder="Jurusan" />
+  <input id="gpaInput" placeholder="GPA (0.00 - 4.00)" type="number" step="0.01" />
+  <button class="primary" onclick="addStudent()">Tambah</button>
+</div>
+
+<div id="panel">
+<button class="primary" onclick="sortByName()">Sort Nama</button>
+<button class="primary" onclick="sortByNIM()">Sort NIM</button>
+<button class="secondary" onclick="sortByGPA()">Sort GPA</button>
+<button class="secondary" onclick="sortByMajor()">Sort Jurusan</button>
+<button class="danger" onclick="resetData()">Reset ke Default</button>
+<br>
+<input id="search" placeholder="Cari nama, NIM, jurusan..." style="width:300px;" />
+</div>
+
+<table>
+<thead>
+    <tr>
+        <th>NIM</th>
+        <th>Nama</th>
+        <th>Email</th>
+        <th>Jurusan</th>
+        <th>GPA</th>
+        <th>Aksi</th>
+    </tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+</div>
+
+<script>
+let defaultData = [
+  { id: "1", name: "Agitsna Naura", nim: "2024001", email: "Agitsna@gmail.com", major: "Informatika", gpa: 3.95 },
+  { id: "2", name: "Abdullah Irfan", nim: "2024002", email: "Abdul@gmail.com", major: "Sistem Informasi", gpa: 3.80 },
+  { id: "3", name: "Afifah Hadi", nim: "2024003", email: "Afifah@gmail.com", major: "Teknik Komputer", gpa: 3.55 },
+  { id: "4", name: "Ahmad Bima", nim: "2024004", email: "Ahmad@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "5", name: "Anas Kurniawan", nim: "2024005", email: "Anas@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "6", name: "Ananda Fathur", nim: "2024006", email: "Ananda@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "7", name: "Akhdan Musyafa", nim: "2024007", email: "Akhdan@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "8", name: "Dafi Ahmad", nim: "2024008", email: "Dafi@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "9", name: "Devania", nim: "2024009", email: "Deva@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "10", name: "Dian Puspita", nim: "2024010", email: "Dian@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "11", name: "Dimas Afzal", nim: "2024011", email: "Dimas@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "12", name: "Fikri Alfian", nim: "2024018", email: "Fikri@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "13", name: "Fira Amanda", nim: "2024014", email: "Fira@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "14", name: "Haidar Syafiq", nim: "2024032", email: "Haidar@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "15", name: "Ika Aulia", nim: "2024030", email: "Ika@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "16", name: "Ghali AlDaffa", nim: "2024031", email: "Ghali@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "17", name: "Lystanta Ramdhan", nim: "2024028", email: "Lystanta@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "18", name: "Ibnu Sirrisakti", nim: "2024020", email: "Ibnu@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "19", name: "M Faiz", nim: "2024015", email: "Faiz@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "20", name: "M Alfareza", nim: "2024035", email: "Reza@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "21", name: "M Ikhwan", nim: "2024040", email: "Ikhwan@gmail.com", major: "Teknik Informatika", gpa: 3.95 },
+  { id: "22", name: "M Fachri", nim: "2024073", email: "Fachri@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "23", name: "M Fathir", nim: "2024086", email: "Fathir@gmail.com", major: "Teknik Informatika", gpa: 3.95 },
+  { id: "24", name: "Rafly Fadhillah", nim: "2024042", email: "Rafly@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "25", name: "Noer Bayu", nim: "2024029", email: "Bayu@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "26", name: "Satria Bambang", nim: "2024051", email: "Satria@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "27", name: "Tria Hapifah", nim: "2024065", email: "Tria@gmail.com", major: "Teknik Informatika", gpa: 2.95 },
+  { id: "28", name: "Rakha Rabbani", nim: "2024094", email: "Rakha@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "29", name: "Randynata", nim: "2024098", email: "Randy@gmail.com", major: "Teknik Informatika", gpa: 3.95 },
+  { id: "30", name: "Rashad Dwi", nim: "2024097", email: "Rashad@gmail.com", major: "Manajemen Informatika", gpa: 3.91 },
+  { id: "31", name: "Yusuf Darmawan", nim: "2024017", email: "Yusuf@gmail.com", major: "Teknik Informatika", gpa: 3.95 },
+  { id: "32", name: "Rivan Athallah", nim: "2024016", email: "Rivan@gmail.com", major: "Manajemen Informatika", gpa: 3.91 }
+
+];
+
+let data = JSON.parse(JSON.stringify(defaultData));
+
+function render(arr){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = arr.map(s=>`
+    <tr>
+      <td>${s.nim}</td>
+      <td>${s.name}</td>
+      <td>${s.email}</td>
+      <td>${s.major}</td>
+      <td>${s.gpa.toFixed(2)}</td>
+      <td><button class="danger" onclick="del('${s.id}')">Hapus</button></td>
+    </tr>`).join('');
+}
+render(data);
+
+function del(id){
+  if(!confirm("Hapus data ini?")) return;
+  data = data.filter(x => x.id !== id);
+  render(data);
+}
+
+search.oninput = (e)=>{
+  const q = e.target.value.toLowerCase();
+  render(data.filter(s => 
+    s.name.toLowerCase().includes(q) || 
+    s.nim.includes(q) || 
+    s.major.toLowerCase().includes(q)
+  ));
+};
+
+function sortByName(){ data.sort((a,b)=>a.name.localeCompare(b.name)); render(data);} 
+function sortByNIM(){ data.sort((a,b)=>a.nim.localeCompare(b.nim)); render(data);} 
+function sortByGPA(){ data.sort((a,b)=>b.gpa - a.gpa); render(data);} 
+function sortByMajor(){ data.sort((a,b)=>a.major.localeCompare(b.major)); render(data);} 
+
+function addStudent(){
+  const name = nameInput.value.trim();
+  const nim = nimInput.value.trim();
+  const email = emailInput.value.trim();
+  const major = majorInput.value.trim();
+  const gpa = parseFloat(gpaInput.value);
+
+  if(!name || !nim || !email || !major || isNaN(gpa)){
+    alert("Semua kolom harus diisi!"); return;
+  }
+  if(!/^[0-9]{5,15}$/.test(nim)){
+    alert("Format NIM tidak valid"); return;
+  }
+  if(!/^.+@.+\..+$/.test(email)){
+    alert("Format email tidak valid"); return;
+  }
+  if(gpa < 0 || gpa > 4){ alert("GPA harus 0.00 - 4.00"); return; }
+
+  data.push({ id: Date.now().toString(), name, nim, email, major, gpa });
+  render(data);
+
+  nameInput.value = "";
+  nimInput.value = "";
+  emailInput.value = "";
+  majorInput.value = "";
+  gpaInput.value = "";
+}
+
+function resetData(){
+  if(!confirm("Kembalikan ke data default?")) return;
+  data = JSON.parse(JSON.stringify(defaultData));
+  render(data);
+}
+</script>
+
+</body>
+</html>
